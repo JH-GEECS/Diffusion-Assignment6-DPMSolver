@@ -124,10 +124,19 @@ class DPMSolverScheduler(BaseScheduler):
             x_t (`torch.Tensor`): one step denoised sample.
         """
         assert torch.all(s > t), f"timestep s should be larger than timestep t"
-        ######## TODO ########
+        # TODO: written
         # DO NOT change the code outside this part.
+        # s = t_{i-1} current step
+        # t = t_i next step
+        
         alpha_s = extract(self.dpm_alphas, s, x_s)
-        x_t = x_s
+        alpha_t = extract(self.dpm_alphas, t, x_s)
+        
+        lambda_s = extract(self.dpm_lambdas, s, x_s)
+        lambda_t = extract(self.dpm_lambdas, t, x_s)
+        
+        x_t = (alpha_t / alpha_s) * x_s - alpha_t * (torch.exp(-lambda_s) - torch.exp(-lambda_t)) * eps_theta
+        
         ######################
         return x_t
     
@@ -183,7 +192,7 @@ class DPMSolverScheduler(BaseScheduler):
             sample_prev = self.second_order_step(x_t, t, t_prev, eps_theta)
 
         return sample_prev
-
+    
     def add_noise(
         self,
         x_0,
@@ -202,10 +211,15 @@ class DPMSolverScheduler(BaseScheduler):
         if eps is None:
             eps = torch.randn(x_0.shape, device=x_0.device)
 
-        ######## TODO ########
+        # TODO: written
         # DO NOT change the code outside this part.
         # Assignment 6. Implement the DPM forward step.
-        x_t = x_0
+        # You can use dpm_alphas, dpm_sigmas and dpm_lambdas variables if needed.
+        
+        alpha = extract(self.dpm_alphas, t, x_0)
+        sigma = extract(self.dpm_sigmas, t, x_0)
+        
+        x_t = alpha * x_0 + sigma * eps        
         
         #######################
 
