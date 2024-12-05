@@ -166,14 +166,31 @@ class DPMSolverScheduler(BaseScheduler):
         # DO NOT change the code outside this part.
         lambda_i1 = extract(self.dpm_lambdas, t_i1, x_ti1)
         lambda_i = extract(self.dpm_lambdas, t_i, x_ti1)
-        s_i = self.inverse_lambda((lambda_i1 + lambda_i) / 2)
-
+        s_i = self.inverse_lambda((lambda_i1 + lambda_i)/2)
+        h_i = lambda_i - lambda_i1
+        
+        alpha_si = extract(self.dpm_alphas, s_i, x_ti1)
+        alpha_i1 = extract(self.dpm_alphas, t_i1, x_ti1)
+        alpha_i = extract(self.dpm_alphas, t_i, x_ti1)
+        
+        sigma_si = extract(self.dpm_sigmas, s_i, x_ti1)
+        sigma_i = extract(self.dpm_sigmas, t_i, x_ti1)
+        
+        eps_i1 = eps_theta
+        u_i = (alpha_si/alpha_i1) * x_ti1 - sigma_si * (torch.exp(h_i/2)-1) * eps_i1
+        
         # An example of computing noise prediction inside the function.
         # In Task 2, you need to make it as CFG sampling.
-        model_output = self.net_forward_fn(
-            x_ti1, t_i1.to(x_ti1.device), class_label=class_label
-        )
-        x_ti = x_ti1
+        null_label = torch.zeros_like(class_label).to(class_label.device)
+        eps_cfg = (1+guidance_scale) * self.net_forward_fn(u_i, s_i.to(u_i.device), class_label=class_label) - guidance_scale * self.net_forward_fn(u_i, s_i.to(u_i.device), class_label=null_label)
+        
+        # eps = self.net_forward_fn(u_i, s_i.to(u_i.device), class_label=class_label)
+        x_ti = (alpha_i/alpha_i1) * x_ti1 - sigma_i * (torch.exp(h_i)-1) * eps_cfg
+
+        # model_output = self.net_forward_fn(
+        #     x_ti1, t_i1.to(x_ti1.device), class_label=class_label
+        # )
+        # x_ti = x_ti1
         ######################
 
         return x_ti

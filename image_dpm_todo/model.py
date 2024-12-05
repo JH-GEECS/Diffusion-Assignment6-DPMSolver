@@ -72,7 +72,7 @@ class DiffusionModule(nn.Module):
             # Implement the classifier-free guidance.
             # You can copy & paste your implementation of previous Assignments.
             noise_pred = (1 + guidance_scale) * self.network(x_t, timestep=t.to(self.device), class_label=class_label) - guidance_scale * self.network(x_t, timestep=t.to(self.device), class_label=null_label)
-            x_t_prev = self.var_scheduler.step(x_t, t, noise_pred, class_label=class_label)
+            x_t_prev = self.var_scheduler.step(x_t, t, noise_pred, class_label=class_label, order=order, guidance_scale=guidance_scale)
             #######################
 
 
