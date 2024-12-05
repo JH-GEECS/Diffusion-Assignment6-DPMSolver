@@ -136,7 +136,12 @@ class DPMSolverScheduler(BaseScheduler):
         ######## TODO ########
         # DO NOT change the code outside this part.
         alpha_s = extract(self.dpm_alphas, s, x_s)
-        x_t = x_s
+        alpha_t = extract(self.dpm_alphas, t, x_s)
+        
+        lambda_s = extract(self.dpm_lambdas, s, x_s)
+        lambda_t = extract(self.dpm_lambdas, t, x_s)
+        
+        x_t = (alpha_t / alpha_s) * x_s - alpha_t * (torch.exp(-lambda_s) - torch.exp(-lambda_t)) * eps_theta
         ######################
         return x_t
 
@@ -228,10 +233,14 @@ class DPMSolverScheduler(BaseScheduler):
         if eps is None:
             eps = torch.randn(x_0.shape, device=x_0.device)
 
-        ######## TODO ########
+        # TODO: written
         # DO NOT change the code outside this part.
         # Assignment 6. Implement the DPM forward step.
-        x_t = x_0
+        
+        alpha = extract(self.dpm_alphas, t, x_0)
+        sigma = extract(self.dpm_sigmas, t, x_0)
+        
+        x_t = alpha * x_0 + sigma * eps  
 
         #######################
 

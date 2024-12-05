@@ -124,7 +124,7 @@ class DPMSolverScheduler(BaseScheduler):
             x_t (`torch.Tensor`): one step denoised sample.
         """
         assert torch.all(s > t), f"timestep s should be larger than timestep t"
-        # TODO: written
+        # TODO: done
         # DO NOT change the code outside this part.
         # s = t_{i-1} current step
         # t = t_i next step
@@ -211,7 +211,7 @@ class DPMSolverScheduler(BaseScheduler):
         if eps is None:
             eps = torch.randn(x_0.shape, device=x_0.device)
 
-        # TODO: written
+        # TODO: done
         # DO NOT change the code outside this part.
         # Assignment 6. Implement the DPM forward step.
         # You can use dpm_alphas, dpm_sigmas and dpm_lambdas variables if needed.

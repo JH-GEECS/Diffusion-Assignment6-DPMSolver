@@ -1,3 +1,9 @@
 **/*.pyc
 __pycache__/
 .ipynb_checkpoints/
+
+*/fid/
+*/chk_point/
+*/sampled_images
+*/results/
+*/data/
