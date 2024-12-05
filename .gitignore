@@ -184,3 +184,7 @@ __pycache__/
 */sampled_images
 */results/
 */data/
+2d_plot_dpm_todo/__pycache__/dataset.cpython-39.pyc
+2d_plot_dpm_todo/__pycache__/model.cpython-39.pyc
+2d_plot_dpm_todo/__pycache__/model.cpython-39.pyc
+2d_plot_dpm_todo/__pycache__/network.cpython-39.pyc

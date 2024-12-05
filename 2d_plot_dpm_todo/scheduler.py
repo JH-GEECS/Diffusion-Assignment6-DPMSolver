@@ -158,10 +158,25 @@ class DPMSolverScheduler(BaseScheduler):
         lambda_i1 = extract(self.dpm_lambdas, t_i1, x_ti1)
         lambda_i = extract(self.dpm_lambdas, t_i, x_ti1)
         s_i = self.inverse_lambda((lambda_i1 + lambda_i)/2)
+        h_i = lambda_i - lambda_i1
+        
+        alpha_si = extract(self.dpm_alphas, s_i, x_ti1)
+        alpha_i1 = extract(self.dpm_alphas, t_i1, x_ti1)
+        alpha_i = extract(self.dpm_alphas, t_i, x_ti1)
+        
+        sigma_si = extract(self.dpm_sigmas, s_i, x_ti1)
+        sigma_i = extract(self.dpm_sigmas, t_i, x_ti1)
+        
+        # t_i1 prev time step
+        # t_i current time step
+        
+        eps_i1 = eps_theta
+        u_i = (alpha_si/alpha_i1) * x_ti1 - sigma_si * (torch.exp(h_i/2)-1) * eps_i1
 
         # An example of computing noise prediction inside the function.
-        model_output = self.net_forward_fn(x_ti1, t_i1.to(x_ti1.device))
-        x_ti = x_ti1
+        eps = self.net_forward_fn(u_i, s_i.to(u_i.device))
+        x_ti = (alpha_i/alpha_i1) * x_ti1 - sigma_i * (torch.exp(h_i)-1) * eps
+        # 나중에 model forward function으로 대체 된다.
         ######################
 
         return x_ti
